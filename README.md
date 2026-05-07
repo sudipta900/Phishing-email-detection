@@ -1,14 +1,23 @@
 ---
-title: ML Model
-emoji: 🤖
+title: PhishGuard API
+emoji: "🛡️"
 colorFrom: blue
-colorTo: purple
-sdk: streamlit
-sdk_version: "1.45.1"
-app_file: app.py
+colorTo: indigo
+sdk: docker
 pinned: false
 ---
 
-# Phishing Email Detection
+# PhishGuard
 
-This app detects phishing emails using machine learning.
+Docker-based FastAPI backend for phishing email detection.
+
+## Endpoints
+
+- `GET /`
+- `GET /health`
+- `POST /predict`
+- `POST /batch-predict`
+
+## Local backend run
+
+Use Python 3.11 if possible for local development.
