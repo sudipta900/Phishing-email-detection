@@ -23,6 +23,19 @@ from app.utils.helpers import (
 )
 
 
+def _align_dense_features(features, expected_size: int):
+    values = list(features)
+
+    if expected_size <= len(values):
+        return np.array(values[:expected_size], dtype=float)
+
+    return np.array(values + ([0.0] * (expected_size - len(values))), dtype=float)
+
+
+def _expected_feature_count(model, fallback_size: int) -> int:
+    return int(getattr(model, "n_features_in_", fallback_size) or fallback_size)
+
+
 def _heuristic_prediction(raw_email_text: str):
     cleaned_text = clean_email_body(raw_email_text)
     threats = explain_threats(raw_email_text)
@@ -69,7 +82,17 @@ def predict_email(raw_email_text: str):
     cleaned_text = clean_email_body(raw_email_text)
 
     tfidf_features = tfidf_vectorizer.transform([cleaned_text])
-    heuristic_features = np.array([extract_heuristic_features(cleaned_text)])
+    text_feature_count = _expected_feature_count(
+        xgb_text_model,
+        tfidf_features.shape[1],
+    )
+    heuristic_feature_count = max(0, text_feature_count - tfidf_features.shape[1])
+    heuristic_features = np.array([
+        _align_dense_features(
+            extract_heuristic_features(cleaned_text),
+            heuristic_feature_count,
+        )
+    ])
 
     combined_features = sp.hstack([
         tfidf_features,
@@ -91,7 +114,13 @@ def predict_email(raw_email_text: str):
     url_score = None
 
     if urls:
-        url_features = np.array([extract_url_features(urls[0])])
+        url_feature_count = _expected_feature_count(xgb_url_model, len(extract_url_features(urls[0])))
+        url_features = np.array([
+            _align_dense_features(
+                extract_url_features(urls[0]),
+                url_feature_count,
+            )
+        ])
         url_score = xgb_url_model.predict_proba(url_features)[0][1]
         final_prob = (final_prob * 0.7) + (url_score * 0.3)
 
