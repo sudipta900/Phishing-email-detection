@@ -79,68 +79,74 @@ def predict_email(raw_email_text: str):
     if not is_full_model_available():
         return _heuristic_prediction(raw_email_text)
 
-    cleaned_text = clean_email_body(raw_email_text)
+    try:
+        cleaned_text = clean_email_body(raw_email_text)
 
-    tfidf_features = tfidf_vectorizer.transform([cleaned_text])
-    text_feature_count = _expected_feature_count(
-        xgb_text_model,
-        tfidf_features.shape[1],
-    )
-    heuristic_feature_count = max(0, text_feature_count - tfidf_features.shape[1])
-    heuristic_features = np.array([
-        _align_dense_features(
-            extract_heuristic_features(cleaned_text),
-            heuristic_feature_count,
+        tfidf_features = tfidf_vectorizer.transform([cleaned_text])
+        text_feature_count = _expected_feature_count(
+            xgb_text_model,
+            tfidf_features.shape[1],
         )
-    ])
-
-    combined_features = sp.hstack([
-        tfidf_features,
-        sp.csr_matrix(heuristic_features),
-    ])
-
-    xgb_text_prob = xgb_text_model.predict_proba(combined_features)[0][1]
-    bert_prob = get_bert_probability(
-        cleaned_text,
-        tokenizer,
-        bert_model,
-        device,
-    )
-
-    ensemble_input = np.array([[xgb_text_prob, bert_prob]])
-    final_prob = ensemble_model.predict_proba(ensemble_input)[0][1]
-
-    urls = extract_urls(raw_email_text)
-    url_score = None
-
-    if urls:
-        url_feature_count = _expected_feature_count(xgb_url_model, len(extract_url_features(urls[0])))
-        url_features = np.array([
+        heuristic_feature_count = max(0, text_feature_count - tfidf_features.shape[1])
+        heuristic_features = np.array([
             _align_dense_features(
-                extract_url_features(urls[0]),
-                url_feature_count,
+                extract_heuristic_features(cleaned_text),
+                heuristic_feature_count,
             )
         ])
-        url_score = xgb_url_model.predict_proba(url_features)[0][1]
-        final_prob = (final_prob * 0.7) + (url_score * 0.3)
 
-    confidence = round(final_prob * 100, 2)
+        combined_features = sp.hstack([
+            tfidf_features,
+            sp.csr_matrix(heuristic_features),
+        ])
 
-    if final_prob >= 0.75:
-        verdict = "PHISHING"
-    elif final_prob >= 0.45:
-        verdict = "SUSPICIOUS"
-    else:
-        verdict = "SAFE"
+        xgb_text_prob = xgb_text_model.predict_proba(combined_features)[0][1]
+        bert_prob = get_bert_probability(
+            cleaned_text,
+            tokenizer,
+            bert_model,
+            device,
+        )
 
-    threats = explain_threats(raw_email_text)
+        ensemble_input = np.array([[xgb_text_prob, bert_prob]])
+        final_prob = ensemble_model.predict_proba(ensemble_input)[0][1]
 
-    return {
-        "verdict": verdict,
-        "confidence": confidence,
-        "xgb_score": round(xgb_text_prob * 100, 2),
-        "bert_score": round(bert_prob * 100, 2),
-        "url_score": round(url_score * 100, 2) if url_score is not None else None,
-        "threats": threats,
-        "model_mode": MODEL_MODE,
-    }
+        urls = extract_urls(raw_email_text)
+        url_score = None
+
+        if urls:
+            url_feature_count = _expected_feature_count(xgb_url_model, len(extract_url_features(urls[0])))
+            url_features = np.array([
+                _align_dense_features(
+                    extract_url_features(urls[0]),
+                    url_feature_count,
+                )
+            ])
+            url_score = xgb_url_model.predict_proba(url_features)[0][1]
+            final_prob = (final_prob * 0.7) + (url_score * 0.3)
+
+        confidence = round(final_prob * 100, 2)
+
+        if final_prob >= 0.75:
+            verdict = "PHISHING"
+        elif final_prob >= 0.45:
+            verdict = "SUSPICIOUS"
+        else:
+            verdict = "SAFE"
+
+        threats = explain_threats(raw_email_text)
+
+        return {
+            "verdict": verdict,
+            "confidence": confidence,
+            "xgb_score": round(xgb_text_prob * 100, 2),
+            "bert_score": round(bert_prob * 100, 2),
+            "url_score": round(url_score * 100, 2) if url_score is not None else None,
+            "threats": threats,
+            "model_mode": MODEL_MODE,
+        }
+    except Exception:
+        result = _heuristic_prediction(raw_email_text)
+        result["model_mode"] = "fallback"
+        result["model_status"] = "Full model inference failed at runtime. Returned heuristic fallback result."
+        return result
