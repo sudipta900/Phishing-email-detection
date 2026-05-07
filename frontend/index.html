@@ -43,14 +43,14 @@
         <h1>Phishing detection UI built now, ML endpoint swappable later.</h1>
         <p class="hero-lead">
           This frontend is already wired for your API contract. When your deployed backend is ready,
-          you only need to update <code>frontend/config.js</code> with the final API base URL.
+          the deployed frontend is configured to use the Hugging Face backend API URL.
         </p>
       </div>
 
       <aside class="status-card">
         <div class="status-topline">API connection target</div>
         <div id="apiStatus" class="status-chip">Local API target</div>
-        <div id="apiEndpoint" class="status-endpoint">http://localhost:8000</div>
+        <div id="apiEndpoint" class="status-endpoint">https://sudip900-ml-model.hf.space</div>
         <p class="status-note">
           Expected routes: <code>POST /predict</code> and <code>POST /batch-predict</code>
         </p>
@@ -257,7 +257,7 @@ Your account has been suspended due to suspicious activity..."></textarea>
     <span class="sep">|</span>
     <span>Prepared for static frontend deployment on Vercel</span>
     <span class="sep">|</span>
-    <span>Update <code>config.js</code> when your API is live</span>
+    <span>Backend API target configured for deployment</span>
   </footer>
 
   <script src="config.js"></script>

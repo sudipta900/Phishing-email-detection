@@ -1,4 +1,4 @@
-const DEFAULT_API_BASE = "http://localhost:8000";
+const DEFAULT_API_BASE = "https://sudip900-ml-model.hf.space";
 const API_BASE = (
     window.PHISHGUARD_CONFIG
     && window.PHISHGUARD_CONFIG.apiBase

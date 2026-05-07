@@ -1,3 +1,3 @@
 window.PHISHGUARD_CONFIG = {
-    apiBase: "http://localhost:8000"
+    apiBase: "https://sudip900-ml-model.hf.space"
 };
