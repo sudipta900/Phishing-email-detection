@@ -3,8 +3,8 @@ from pathlib import Path
 
 import torch
 from transformers import (
+    AutoTokenizer,
     DistilBertForSequenceClassification,
-    DistilBertTokenizer,
 )
 
 from app.config import BERT_PATH, MODELS_PATH
@@ -26,12 +26,18 @@ def _file_has_content(path: Path) -> bool:
 
 
 def _bert_assets_available(path: Path) -> bool:
-    required_files = [
+    required_files = {
         "config.json",
         "model.safetensors",
         "tokenizer_config.json",
-    ]
-    return path.exists() and all((path / file_name).exists() for file_name in required_files)
+    }
+    tokenizer_files = {"tokenizer.json", "vocab.txt"}
+
+    return (
+        path.exists()
+        and all((path / file_name).exists() for file_name in required_files)
+        and any((path / file_name).exists() for file_name in tokenizer_files)
+    )
 
 
 def _load_pickle(path: Path):
@@ -73,7 +79,7 @@ def load_models() -> None:
 
     if _bert_assets_available(BERT_PATH):
         try:
-            tokenizer = DistilBertTokenizer.from_pretrained(BERT_PATH)
+            tokenizer = AutoTokenizer.from_pretrained(BERT_PATH)
             bert_model = DistilBertForSequenceClassification.from_pretrained(BERT_PATH)
             bert_model.to(device)
             bert_model.eval()
