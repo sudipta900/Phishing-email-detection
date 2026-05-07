@@ -3,22 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PhishGuard — Email Threat Detector</title>
+  <title>PhishGuard - Email Threat Detector</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
-  <link rel="script" href="script.js" />
 </head>
 <body>
-  <!-- Background grid -->
   <div class="grid-bg"></div>
 
-  <!-- Header -->
   <header class="header">
     <div class="logo">
       <div class="logo-icon">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
           <path d="M14 2L26 8V20L14 26L2 20V8L14 2Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
           <path d="M14 8V14L18 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
           <circle cx="14" cy="14" r="2" fill="currentColor"/>
@@ -26,77 +23,96 @@
       </div>
       <span class="logo-text">PhishGuard</span>
     </div>
-    <nav class="nav-pills">
+
+    <nav class="nav-pills" aria-label="Main navigation">
       <button class="pill active" onclick="switchTab('analyze')">Analyze</button>
       <button class="pill" onclick="switchTab('batch')">Batch</button>
       <button class="pill" onclick="switchTab('guide')">Guide</button>
     </nav>
+
     <div class="header-badge">
       <span class="pulse-dot"></span>
-      <span>Live Detection</span>
+      <span>Threat Detection Ready</span>
     </div>
   </header>
 
-  <!-- Main Content -->
   <main class="main">
+    <section class="hero-shell">
+      <div class="hero-copy">
+        <p class="eyebrow">Static frontend ready for Vercel</p>
+        <h1>Phishing detection UI built now, ML endpoint swappable later.</h1>
+        <p class="hero-lead">
+          This frontend is already wired for your API contract. When your deployed backend is ready,
+          you only need to update <code>frontend/config.js</code> with the final API base URL.
+        </p>
+      </div>
 
-    <!-- ANALYZE TAB -->
+      <aside class="status-card">
+        <div class="status-topline">API connection target</div>
+        <div id="apiStatus" class="status-chip">Local API target</div>
+        <div id="apiEndpoint" class="status-endpoint">http://localhost:8000</div>
+        <p class="status-note">
+          Expected routes: <code>POST /predict</code> and <code>POST /batch-predict</code>
+        </p>
+      </aside>
+    </section>
+
     <section id="tab-analyze" class="tab active">
       <div class="hero-text">
-        <h1>Is this email a <span class="highlight">threat</span>?</h1>
-        <p>Paste any email content below for instant phishing analysis powered by rule-based NLP and machine learning.</p>
+        <h2>Is this email a <span class="highlight">threat</span>?</h2>
+        <p>Paste an email to review urgency, suspicious wording, URL risk, and model confidence.</p>
       </div>
 
       <div class="analyzer-grid">
-        <!-- Input Panel -->
         <div class="panel input-panel">
           <div class="panel-header">
-            <span class="panel-label">EMAIL INPUT</span>
+            <span class="panel-label">Email Input</span>
             <div class="header-actions">
-              <button class="ghost-btn" onclick="loadSample('phishing')" title="Load phishing sample">⚠ Sample Phish</button>
-              <button class="ghost-btn" onclick="loadSample('legit')" title="Load legitimate sample">✓ Sample Legit</button>
-              <button class="ghost-btn" onclick="clearInput()" title="Clear">✕ Clear</button>
+              <button class="ghost-btn" onclick="loadSample('phishing')" title="Load phishing sample">Sample Phish</button>
+              <button class="ghost-btn" onclick="loadSample('legit')" title="Load legitimate sample">Sample Legit</button>
+              <button class="ghost-btn" onclick="clearInput()" title="Clear editor">Clear</button>
             </div>
           </div>
+
           <textarea
             id="emailInput"
             class="email-textarea"
-            placeholder="Paste email subject, headers, and body here...
+            placeholder="Paste email subject, sender, headers, and body here.
 
 Example:
-Subject: URGENT — Account Suspended
+Subject: Urgent - Account Suspended
 From: security@paypa1-alerts.com
 
 Dear Customer,
 Your account has been suspended due to suspicious activity..."></textarea>
+
           <div class="input-footer">
-            <span id="charCount" class="char-count">0 characters</span>
+            <span id="charCount" class="char-count">0 characters / 0 words</span>
             <button id="analyzeBtn" class="analyze-btn" onclick="analyzeEmail()">
-              <span class="btn-icon">⬡</span>
+              <span class="btn-icon">[]</span>
               <span>Analyze Email</span>
             </button>
           </div>
         </div>
 
-        <!-- Results Panel -->
-        <div class="panel results-panel" id="resultsPanel">
+        <div class="panel results-panel">
           <div id="emptyState" class="empty-state">
             <div class="empty-icon">
-              <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+              <svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">
                 <path d="M32 4L60 18V46L32 60L4 46V18L32 4Z" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.3"/>
                 <path d="M32 16L48 24V40L32 48L16 40V24L32 16Z" stroke="currentColor" stroke-width="1" fill="none" opacity="0.2"/>
                 <circle cx="32" cy="32" r="4" fill="currentColor" opacity="0.2"/>
               </svg>
             </div>
-            <p>Results will appear here after analysis</p>
+            <p>Results will appear here after analysis.</p>
           </div>
 
           <div id="loadingState" class="loading-state hidden">
             <div class="scan-animation">
               <div class="scan-line"></div>
               <div class="scan-hex">
-                <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-                  <path class="hex-rotate" d="M40 5L75 22.5V57.5L40 75L5 57.5V22.5L40 5Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                <svg width="80" height="80" viewBox="0 0 80 80" fill="none" aria-hidden="true">
+                  <path d="M40 5L75 22.5V57.5L40 75L5 57.5V22.5L40 5Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
                 </svg>
               </div>
             </div>
@@ -104,7 +120,6 @@ Your account has been suspended due to suspicious activity..."></textarea>
           </div>
 
           <div id="resultContent" class="result-content hidden">
-            <!-- Verdict Banner -->
             <div id="verdictBanner" class="verdict-banner">
               <div class="verdict-icon" id="verdictIcon"></div>
               <div class="verdict-text">
@@ -112,43 +127,38 @@ Your account has been suspended due to suspicious activity..."></textarea>
                 <div id="verdictSub" class="verdict-sub"></div>
               </div>
               <div class="verdict-score-wrap">
-                <svg class="score-ring" width="80" height="80" viewBox="0 0 80 80">
+                <svg class="score-ring" width="80" height="80" viewBox="0 0 80 80" aria-hidden="true">
                   <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="6"/>
                   <circle id="scoreArc" cx="40" cy="40" r="32" fill="none" stroke="currentColor" stroke-width="6"
                     stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201"
                     transform="rotate(-90 40 40)"/>
                 </svg>
-                <div class="score-number" id="scoreNumber">0</div>
+                <div class="score-number" id="scoreNumber">0%</div>
               </div>
             </div>
 
-            <!-- Threat Indicators -->
-            <div class="section-title">THREAT INDICATORS</div>
+            <div class="section-title">Threat Indicators</div>
             <div id="indicatorsList" class="indicators-list"></div>
 
-            <!-- Stats Row -->
             <div class="stats-row" id="statsRow"></div>
-
-            <!-- Mode Badge -->
             <div class="analysis-mode" id="analysisMode"></div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- BATCH TAB -->
     <section id="tab-batch" class="tab hidden">
       <div class="hero-text">
-        <h1>Batch <span class="highlight">Analysis</span></h1>
-        <p>Analyze multiple emails at once. Add each email in its own entry box.</p>
+        <h2>Batch <span class="highlight">analysis</span></h2>
+        <p>Queue multiple messages and send them to the batch endpoint in one request.</p>
       </div>
 
       <div class="batch-container">
         <div id="batchEmails" class="batch-emails">
-          <div class="batch-item" data-index="0">
+          <div class="batch-item">
             <div class="batch-item-header">
-              <span class="batch-num">EMAIL 1</span>
-              <button class="ghost-btn" onclick="removeBatchItem(this)">✕ Remove</button>
+              <span class="batch-num">Email 1</span>
+              <button class="ghost-btn" onclick="removeBatchItem(this)">Remove</button>
             </div>
             <textarea class="batch-textarea" placeholder="Paste email content here..."></textarea>
             <div class="batch-result hidden"></div>
@@ -156,104 +166,101 @@ Your account has been suspended due to suspicious activity..."></textarea>
         </div>
 
         <div class="batch-controls">
-          <button class="ghost-btn add-btn" onclick="addBatchItem()">+ Add Email</button>
-          <button class="analyze-btn" onclick="analyzeBatch()">
-            <span class="btn-icon">⬡</span>
+          <button class="ghost-btn add-btn" onclick="addBatchItem()">Add Email</button>
+          <button id="batchAnalyzeBtn" class="analyze-btn" onclick="analyzeBatch()">
+            <span class="btn-icon">[]</span>
             <span>Analyze All</span>
           </button>
         </div>
       </div>
     </section>
 
-    <!-- GUIDE TAB -->
     <section id="tab-guide" class="tab hidden">
       <div class="hero-text">
-        <h1>Phishing <span class="highlight">Indicators</span></h1>
-        <p>Learn to identify phishing emails with these key warning signs.</p>
+        <h2>Phishing <span class="highlight">indicators</span></h2>
+        <p>Use these cues to explain results to users and validate what the model flags.</p>
       </div>
 
       <div class="guide-grid">
         <div class="guide-card severity-high">
-          <div class="guide-card-icon">⚠</div>
-          <h3>Urgency & Fear Tactics</h3>
-          <p>Phrases like "Act Now", "Account Suspended", "Immediate Action Required" create panic to bypass rational thinking.</p>
+          <div class="guide-card-icon">!</div>
+          <h3>Urgency and fear tactics</h3>
+          <p>Messages that pressure users to act immediately are a common social engineering tactic.</p>
           <div class="examples">
-            <span class="ex-tag">URGENT</span>
+            <span class="ex-tag">urgent</span>
             <span class="ex-tag">24 hours</span>
             <span class="ex-tag">suspended</span>
-            <span class="ex-tag">expires today</span>
+            <span class="ex-tag">immediate action</span>
           </div>
         </div>
 
         <div class="guide-card severity-high">
-          <div class="guide-card-icon">🔗</div>
-          <h3>Suspicious URLs</h3>
-          <p>Links with IP addresses, excessive subdomains, misspelled brand names, or URL shorteners are major red flags.</p>
+          <div class="guide-card-icon">URL</div>
+          <h3>Suspicious links</h3>
+          <p>Watch for misspelled domains, shortened links, IP-based URLs, and overly nested subdomains.</p>
           <div class="examples">
-            <span class="ex-tag">192.168.1.1/login</span>
             <span class="ex-tag">paypa1.com</span>
-            <span class="ex-tag">bit.ly/...</span>
+            <span class="ex-tag">bit.ly</span>
+            <span class="ex-tag">192.168.1.1</span>
           </div>
         </div>
 
         <div class="guide-card severity-medium">
-          <div class="guide-card-icon">🏢</div>
-          <h3>Brand Impersonation</h3>
-          <p>Attackers mimic trusted brands like PayPal, Apple, Microsoft, or banks to gain trust and steal credentials.</p>
+          <div class="guide-card-icon">ID</div>
+          <h3>Brand impersonation</h3>
+          <p>Attackers often copy the tone and appearance of trusted companies to make the email feel legitimate.</p>
           <div class="examples">
-            <span class="ex-tag">PayPal Security</span>
-            <span class="ex-tag">Apple Support</span>
-            <span class="ex-tag">Microsoft Team</span>
+            <span class="ex-tag">bank alert</span>
+            <span class="ex-tag">apple support</span>
+            <span class="ex-tag">microsoft team</span>
           </div>
         </div>
 
         <div class="guide-card severity-high">
-          <div class="guide-card-icon">🔑</div>
-          <h3>Sensitive Data Requests</h3>
-          <p>Legitimate services never ask for passwords, SSNs, credit card numbers, or PINs via email.</p>
+          <div class="guide-card-icon">KEY</div>
+          <h3>Credential requests</h3>
+          <p>Any direct request for passwords, card numbers, one-time codes, or PINs should be treated carefully.</p>
           <div class="examples">
             <span class="ex-tag">password</span>
-            <span class="ex-tag">credit card</span>
-            <span class="ex-tag">SSN</span>
             <span class="ex-tag">PIN</span>
+            <span class="ex-tag">verify account</span>
           </div>
         </div>
 
         <div class="guide-card severity-medium">
-          <div class="guide-card-icon">🎁</div>
-          <h3>Too-Good-To-Be-True Offers</h3>
-          <p>Lottery wins, prize claims, free gifts, or unexpected inheritances are classic social engineering lures.</p>
+          <div class="guide-card-icon">GIFT</div>
+          <h3>Unexpected offers</h3>
+          <p>Prize claims, giveaways, and inherited wealth narratives are still effective bait because they create excitement.</p>
           <div class="examples">
             <span class="ex-tag">winner</span>
             <span class="ex-tag">free gift</span>
-            <span class="ex-tag">million dollars</span>
+            <span class="ex-tag">claim reward</span>
           </div>
         </div>
 
         <div class="guide-card severity-low">
-          <div class="guide-card-icon">✍</div>
-          <h3>Poor Grammar & Formatting</h3>
-          <p>Excessive caps, typos, strange punctuation!!!!, and odd formatting can indicate automated or non-native phishing attempts.</p>
+          <div class="guide-card-icon">TXT</div>
+          <h3>Poor writing signals</h3>
+          <p>Typos, excessive punctuation, and odd formatting are weak signals alone, but useful in combination.</p>
           <div class="examples">
-            <span class="ex-tag">ALL CAPS</span>
-            <span class="ex-tag">!!!!!!</span>
+            <span class="ex-tag">all caps</span>
             <span class="ex-tag">spelling errors</span>
+            <span class="ex-tag">!!!!!!</span>
           </div>
         </div>
       </div>
     </section>
-
   </main>
 
-  <!-- Footer -->
   <footer class="footer">
     <span>PhishGuard v1.0</span>
-    <span class="sep">·</span>
-    <span>For educational & security research purposes</span>
-    <span class="sep">·</span>
-    <span>Never submit real credentials to any link in suspicious emails</span>
+    <span class="sep">|</span>
+    <span>Prepared for static frontend deployment on Vercel</span>
+    <span class="sep">|</span>
+    <span>Update <code>config.js</code> when your API is live</span>
   </footer>
 
+  <script src="config.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
