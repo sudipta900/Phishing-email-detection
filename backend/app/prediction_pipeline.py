@@ -55,7 +55,7 @@ def _heuristic_prediction(raw_email_text: str):
         )
         final_prob = (final_prob * 0.7) + (url_score * 0.3)
 
-    confidence = round(final_prob * 100, 2)
+    confidence = round(float(final_prob) * 100, 2)
 
     if final_prob >= 0.75:
         verdict = "PHISHING"
@@ -66,10 +66,10 @@ def _heuristic_prediction(raw_email_text: str):
 
     return {
         "verdict": verdict,
-        "confidence": confidence,
-        "xgb_score": round(xgb_text_prob * 100, 2),
-        "bert_score": round(bert_prob * 100, 2),
-        "url_score": round(url_score * 100, 2) if url_score is not None else None,
+        "confidence": float(confidence),
+        "xgb_score": float(round(float(xgb_text_prob) * 100, 2)),
+        "bert_score": float(round(float(bert_prob) * 100, 2)),
+        "url_score": float(round(float(url_score) * 100, 2)) if url_score is not None else None,
         "threats": threats,
         "model_mode": MODEL_MODE,
     }
@@ -125,7 +125,7 @@ def predict_email(raw_email_text: str):
             url_score = xgb_url_model.predict_proba(url_features)[0][1]
             final_prob = (final_prob * 0.7) + (url_score * 0.3)
 
-        confidence = round(final_prob * 100, 2)
+        confidence = round(float(final_prob) * 100, 2)
 
         if final_prob >= 0.75:
             verdict = "PHISHING"
@@ -138,10 +138,10 @@ def predict_email(raw_email_text: str):
 
         return {
             "verdict": verdict,
-            "confidence": confidence,
-            "xgb_score": round(xgb_text_prob * 100, 2),
-            "bert_score": round(bert_prob * 100, 2),
-            "url_score": round(url_score * 100, 2) if url_score is not None else None,
+            "confidence": float(confidence),
+            "xgb_score": float(round(float(xgb_text_prob) * 100, 2)),
+            "bert_score": float(round(float(bert_prob) * 100, 2)),
+            "url_score": float(round(float(url_score) * 100, 2)) if url_score is not None else None,
             "threats": threats,
             "model_mode": MODEL_MODE,
         }
