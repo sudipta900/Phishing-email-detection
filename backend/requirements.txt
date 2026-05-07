@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+numpy
+scipy
+torch
+transformers
+scikit-learn
+xgboost
+beautifulsoup4
+python-multipart
+pydantic
