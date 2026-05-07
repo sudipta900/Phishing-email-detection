@@ -143,12 +143,30 @@ window.PHISHGUARD_CONFIG = {
 
 ## Local backend run
 
-If you want to test locally before pushing to Spaces:
+If you want to test locally before pushing to Spaces, use Python 3.11 if possible. This project uses ML packages that are much more reliable on Python 3.11 or 3.12 than on Python 3.13.
+
+### Windows PowerShell
+
+From the repo root:
+
+```powershell
+.\start_backend.ps1
+```
+
+That script:
+
+- prefers `py -3.11` when available
+- creates `backend/.venv/`
+- installs missing backend dependencies
+- starts `uvicorn` on port `8000`
+
+### Manual run
 
 ```bash
 cd backend
-pip install -r requirements.txt
-uvicorn app.main:app --host 0.0.0.0 --port 8000
+python -m venv .venv
+.venv\Scripts\python -m pip install -r requirements.txt
+.venv\Scripts\python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
 ## Suggested order
